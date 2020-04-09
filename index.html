@@ -210,16 +210,6 @@
 
     <div id="mapid"></div>
 
-<br>
-<p>
-  <label for="amount">Date range:</label>
-  <input type="text" id="amount" style="border: 0; color: #f6931f; font-weight: bold;" size="100"/>
-</p>
-    <!--<div style='margin-left: 10%; margin-right: 10%' id="slider"></div>-->
-
-    <button id = "play" class="ui-button ui-widget ui-corner-all">Play</button>
-
-
 
 
 
@@ -477,58 +467,9 @@
     //---control which legend is shown---//
     //start with cases
     legend_cases.addTo(mymap);
-    mymap.on('baselayerchange', function(eventLayer) {
-      if(eventLayer.name == "Case Count"){
-        mymap.removeControl(legend_rt)
-        mymap.removeControl(legend_per_delta)
-        legend_cases.addTo(mymap);
-      } else if(eventLayer.name == '% Increase'){
-        mymap.removeControl(legend_rt)
-        mymap.removeControl(legend_cases)
-        legend_per_delta.addTo(mymap);
-      } else if(eventLayer.name == 'R(t)'){
-        mymap.removeControl(legend_per_delta)
-        mymap.removeControl(legend_cases)
-        legend_rt.addTo(mymap);
-      }
-    });
+    
 
   
-
-
-
-
-
-
-
-
-
-    mymap.on('baselayerchange', function(layer){
-      mymap.removeLayer(case_layer)
-      mymap.removeLayer(per_inc_layer)
-      mymap.removeLayer(rt_layer)
-
-      if(layer.name == "% Increase"){
-        var d = new Date($("#slider").slider("value"))
-        var date_fixed = d.yyyymmdd()
-        var data_var = "per_delta_" + date_fixed
-        buildDeltaLayer(data_var)
-
-      } else if(layer.name == "Case Count"){
-        var d = new Date($("#slider").slider("value"))
-        var date_fixed = d.yyyymmdd()
-        var data_var = "case_count_" + date_fixed
-
-        buildCaseLayer(data_var)
-      } else if(layer.name == "R(t)"){
-        var d = new Date($("#slider").slider("value"))
-        var date_fixed = d.yyyymmdd()
-        var data_var = "r_t_" + date_fixed
-
-        buildRtLayer(data_var)
-      }
-
-    })
 
 
 
@@ -733,19 +674,33 @@ function getFormattedDate(date) {
         var data_var = "per_delta_" + date_fixed
         buildDeltaLayer(data_var)
 
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_cases)
+        legend_per_delta.addTo(mymap);
+
       } else if(selection == "case_count"){
         var d = new Date($("#slider").slider("value"))
         var date_fixed = d.yyyymmdd()
         var data_var = "case_count_" + date_fixed
-
         buildCaseLayer(data_var)
+
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_per_delta)
+        legend_cases.addTo(mymap);
+
       } else if(selection == "rt"){
         var d = new Date($("#slider").slider("value"))
         var date_fixed = d.yyyymmdd()
         var data_var = "r_t_" + date_fixed
-
         buildRtLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        legend_rt.addTo(mymap);
       }
+
+
+
 
     });
 
