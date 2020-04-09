@@ -322,12 +322,12 @@
         mouseover: highlightFeature,
         mouseout: resetHighlight_per_inc
       });
-      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Increase: ' + Math.round(feature.properties[my_data_var] * 100)+ "%")
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Increase: ' + feature.properties[my_data_var] + "%")
     }
 
     function style_per_inc(feature){
       return{
-        fillColor: getColor_per_delta(feature.properties[my_data_var]*100),
+        fillColor: getColor_per_delta(feature.properties[my_data_var]),
         weight: .2,
         opacity: 1,
         color: 'grey',
