@@ -458,9 +458,9 @@
     }).addTo(mymap);
 
     //initialize layers
-    buildCaseLayer('case_count_20200407')
-    buildDeltaLayer('per_delta_20200407')
-    buildRtLayer('r_t_20200401')
+    buildCaseLayer('case_count_20200408')
+    //buildDeltaLayer('per_delta_20200407')
+    //buildRtLayer('r_t_20200401')
     
     //---setup layer controls---//
     //var baseMaps = {
@@ -538,7 +538,7 @@ $( ".controlgroup" ).controlgroup()
 
 
     mindate = new Date('2020-03-02').getTime();
-    maxdate = new Date('2020-04-08').getTime();
+    maxdate = new Date('2020-04-09').getTime();
     $( "#slider" ).slider({
       range: false,
       min: mindate,
