@@ -445,7 +445,6 @@
   })
 
   $.when(counties).done(function() {
-    console.log(counties)
       
     //start map centered on us
     mymap = L.map('mapid').setView([38, -96], 5);
@@ -534,10 +533,17 @@ L.control.slider({ position: 'bottomleft' }).addTo(mymap);
 
 $( ".controlgroup" ).controlgroup()
 
+  String.prototype.splice = function(idx, rem, str) {
+    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+  };
 
+    var prop = counties.responseJSON.features[0].properties
+    var prop_keys = Object.keys(prop)
+    var max_date = prop_keys.slice(-1)[0].replace('cases_per_10k_', '')
+    var final_date = max_date.splice(4,0, '-').splice(7,0,'-')
 
     mindate = new Date('2020-03-02').getTime();
-    maxdate = new Date('2020-04-20').getTime();
+    maxdate = new Date(final_date).getTime() + (60 * 60 * 24 * 1000);
     $( "#slider" ).slider({
       range: false,
       min: mindate,
@@ -709,7 +715,11 @@ function getFormattedDate(date) {
 
 
 
+
+
     });
+
+    
 
 
     
