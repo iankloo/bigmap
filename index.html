@@ -714,7 +714,7 @@ function getFormattedDate(date) {
 
   $("#play").click( function() {
 
-    mymap.removeLayer(case_layer)
+	mymap.removeLayer(case_layer)
     mymap.removeLayer(per_inc_layer)
     mymap.removeLayer(rt_layer)
     mymap.removeLayer(rt_three_layer)
@@ -724,17 +724,26 @@ function getFormattedDate(date) {
     if(current == maxdate){
       $("#slider").slider("option", "value", mindate)
     }
+
+    //$("#play").html('&#9612;&#9612;')
+
     
     int = setInterval(function(){
       current = $("#slider").slider('value')
       $("#slider").slider("option", "value", current + 86400000);
+
       if ((current + 86400000) == maxdate) {
         clearInterval(int);
+        //$("#play").html('&#9658;')
       }
 
-    }, 10)
+    }, 20)
     
   })
+
+  //$("#pause").click( function() {
+//	clearInterval(int);
+  //})
 
 
   $("#slider").slider("option", "value", maxdate)
