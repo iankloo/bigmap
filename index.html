@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>COVID-19 Map</title>
+  </head>
+  
+  <body> 
+
+
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+
+       <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+      <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+<script src="moment.js"></script>
+
+
+  <script type='text/javascript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+<script src="echarts.min.js"></script>
+
+
+   <style>
+
+    .ui-slider-tick-mark{
+      display:inline-block;
+      width:1px;
+      background:black;
+      height:2px;
+      position:absolute;
+      left:-2 px;
+      top: 4.5px;
+    }
+
+    #slider label {
+      position: absolute;
+      width: 20px;
+      margin-top: 20px;
+      margin-left: -10px;
+      text-align: center;
+    }
+
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+		#mapid { 
+      height: 100%; 
+      width: 100%;
+    }
+
+
+
+    #title{
+      margin-bottom: 20px;
+    }
+    #metric_input{
+      padding-left: 20px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      padding-right: 10px;
+    }
+
+
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+    .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+
+    
+    .legend {
+      line-height: 18px;
+      color: #555;
+    }
+    .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+
+    .legend_title{
+      display: block;
+      text-align: center;
+      margin-bottom: -15px;
+    }
+
+    .leaflet-control-layers-base > label{
+      margin-bottom: 0px !important;
+    }
+
+
+    #slider {
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+      width: 500px;
+      margin-left: 50px;
+      margin-bottom: 50px;
+    }
+
+    #play{
+      bottom: 8px;
+    }
+
+
+
+
+.tooltip_custom {
+    position: absolute;
+    display: block;
+    padding: 5px;
+    font-size: 11px;
+    visibility: visible;
+    margin-top: -2px;
+    bottom:100%;
+    margin-left: -3.2em;
+}
+
+.tooltip .tooltip-arrow {
+    bottom: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-top: 5px solid #000000;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.tooltip-inner {
+    max-width: 200px;
+    padding: 2px 6px;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.8);
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+}
+
+
+.ui-slider .ui-slider-handle:focus { outline: 1px dotted gray; }
+
+
+.block {
+      display: block;
+   }
+
+   .myButtonBar {
+      padding: 10px 10px 4px 6px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    .block > input{
+      margin-right: 5px;
+    }
+
+  #slider > label {
+    width: 90px;
+    margin-left: -40px;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.8);
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+  }
+
+  fieldset {
+    border: none !important;
+  }
+
+  #x {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 1;
+}
+
+
+
+ 
+
+   </style>
+
+
+
+    <div id="mapid"></div>
+
+
+
+
+  </body>
+
+  <script>
+
+
+
+
+
+
+
+
+  //--------colors for each layer--------//
+  function getColor_cases(d) {
+    return d > 10000 ? '#BD0026' :
+           d > 1000  ? '#F03B20' :
+           d > 100   ? '#FD8D3C' :
+           d > 10   ? '#FECC5C' :
+           d > 0    ? '#FFFFB2' :
+                      '#808080';
+  } 
+
+  function getColor_per_delta(d) {
+      return d > 200 ? '#800026' :
+             d > 100  ? '#BD0026' :
+             d > 50  ? '#E31A1C' :
+             d > 20  ? '#FC4E2A' :
+             d > 10   ? '#FD8D3C' :
+             d > 5   ? '#FEB24C' :
+             d > 0   ? '#FED976' :
+                        '#808080';
+    } 
+
+  function getColor_rt(d) {
+    return d > 4 ? '#BD0026' :
+           d > 3  ? '#F03B20' :
+           d > 2   ? '#FD8D3C' :
+           d > 1   ? '#FECC5C' :
+           d > 0   ? '#FFFFB2'  :
+                      '#808080';
+  }
+
+  function getColor_rt_three(d) {
+    return d > 4 ? '#BD0026' :
+           d > 3  ? '#F03B20' :
+           d > 2   ? '#FD8D3C' :
+           d > 1   ? '#FECC5C' :
+           d > 0   ? '#FFFFB2'  :
+                      '#808080';
+  }
+
+  function getColor_death(d) {
+    return d > 1000 ? '#BD0026' :
+           d > 100  ? '#F03B20' :
+           d > 10   ? '#FD8D3C' :
+           d > 0    ? '#FFFFB2' :
+           			   '#808080';
+
+  }
+
+
+
+    function getColor_doubling(d) {
+
+    	if(d == null){
+    		return('#808080')
+    	} else if(d < 2){
+    		return('#BD0026')
+    	} else if(d < 5){
+    		return('#F03B20')
+    	} else if(d < 10){
+    		return('#FD8D3C')
+    	} else if(d < 20){
+    		return('#FECC5C')
+    	} else {
+    		return('#FFFFB2')
+    	}
+
+
+  }
+    
+
+
+  //--------highlight controls for each layer--------//
+  function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 2,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+
+  }
+
+  function buildCaseLayer(my_data_var){
+
+    function resetHighlight_cases(e) {
+      case_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_cases(feature, layer) {
+      layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight_cases
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Cases: ' + feature.properties[my_data_var])
+    }
+
+    function style_cases(feature){
+      return{
+        fillColor: getColor_cases(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    case_layer = L.geoJSON(counties.responseJSON, {
+      style: style_cases,
+      onEachFeature: onEachFeature_cases
+    }).addTo(mymap);
+
+    case_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('case_count'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('case_count_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of Cases in ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {},
+            series: [{
+                name: 'Cases',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+  function buildDeltaLayer(my_data_var){
+
+    function resetHighlight_per_inc(e) {
+      per_inc_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_per_inc(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_per_inc
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Increase: ' + feature.properties[my_data_var] + "%")
+    }
+
+    function style_per_inc(feature){
+      return{
+        fillColor: getColor_per_delta(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    per_inc_layer = L.geoJSON(counties.responseJSON, {
+      style: style_per_inc,
+      onEachFeature: onEachFeature_per_inc
+    }).addTo(mymap);
+
+    per_inc_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('per_delta'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('per_delta_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of % Increase in ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {},
+            series: [{
+                name: '% Change',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+  function buildRtLayer(my_data_var){
+
+    function resetHighlight_rt(e) {
+      rt_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_rt(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_rt
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>R(t): ' + feature.properties[my_data_var])
+    }
+
+    function style_rt(feature){
+      return{
+        fillColor: getColor_rt(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    rt_layer = L.geoJSON(counties.responseJSON, {
+      style: style_rt,
+      onEachFeature: onEachFeature_rt
+    }).addTo(mymap);
+
+
+    rt_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('r_t'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('r_t_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of R(t) in ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {
+            	max: 10
+            },
+            series: [{
+                name: 'R(t)',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+function buildRtThreeLayer(my_data_var){
+
+    function resetHighlight_rt_three(e) {
+      rt_three_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_rt_three(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_rt_three
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>R(t) 3-Day Avg: ' + feature.properties[my_data_var])
+    }
+
+    function style_rt_three(feature){
+      return{
+        fillColor: getColor_rt_three(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    rt_three_layer = L.geoJSON(counties.responseJSON, {
+      style: style_rt_three,
+      onEachFeature: onEachFeature_rt_three
+    }).addTo(mymap);
+
+
+    rt_three_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('r_t_three'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('r_t_three_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of R(t) (3 Day Moving Average) \nin ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {
+            	max: 10
+            },
+            series: [{
+                name: 'R(t)',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+
+  function buildDeathLayer(my_data_var){
+
+    function resetHighlight_death(e) {
+      death_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_death(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_death
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Deaths: ' + feature.properties[my_data_var])
+    }
+
+    function style_death(feature){
+      return{
+        fillColor: getColor_death(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    death_layer = L.geoJSON(counties.responseJSON, {
+      style: style_death,
+      onEachFeature: onEachFeature_death
+    }).addTo(mymap);
+
+
+    death_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('deaths'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('deaths_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of Deaths in ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {},
+            series: [{
+                name: 'Deaths',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+
+  function buildDoublingLayer(my_data_var){
+
+    function resetHighlight_doubling(e) {
+      doubling_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_doubling(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_doubling
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>Days to Double: ' + feature.properties[my_data_var])
+    }
+
+    function style_doubling(feature){
+      return{
+        fillColor: getColor_doubling(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    doubling_layer = L.geoJSON(counties.responseJSON, {
+      style: style_doubling,
+      onEachFeature: onEachFeature_doubling
+    }).addTo(mymap);
+
+    doubling_layer.on('click', function(e){
+
+    	if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+		L.Control.Plot = L.Control.extend({
+		onAdd: function(map) {
+	      var container = L.DomUtil.create('div', 'search-container');
+	      container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+	      //L.DomEvent.disableClickPropagation(container);
+
+	      return container;
+	    },
+
+	    onRemove: function(map) {
+	        // Nothing to do here
+		    }
+		})
+
+		L.control.plot = function(opts){
+			return new L.Control.Plot(opts)
+		}
+
+
+		testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+		sub_dat = counties.responseJSON.features.filter(function(d){
+			return d.properties.FIPS == e.layer.feature.properties.FIPS
+		})
+
+		props = Object.getOwnPropertyNames(sub_dat[0].properties)
+		my_props = props.filter(s => s.includes('doubling'));
+
+		filtered = Object.keys(sub_dat[0].properties)
+		  .filter(key => my_props.includes(key))
+		  .reduce((obj, key) => {
+		    obj[key] = sub_dat[0].properties[key];
+		    return obj;
+		  }, {});
+
+		 plot_dat = Object.values(filtered)
+
+		 dates = my_props.map(function(x){return x.replace('doubling_', '');});
+		 dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+		//console.log(e.layer.feature.properties.FIPS)
+
+		var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of Days to Double ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+	           feature: {
+	               saveAsImage : {show: true, title: " "}
+
+	           }
+	       },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {},
+            series: [{
+                name: 'Days',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+    		mymap.removeControl(testlayer)
+    		console.log('clicked')
+    	})
+
+	})
+
+  }
+
+
+  //--------legend for each layer--------//
+  legend_cases = L.control({position: 'bottomright'});
+  legend_cases.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          cases = [10000, 1000, 100, 10, 0],
+          labels = ['<span class = "legend_title"><strong> Cases </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < cases.length; i++) {
+          div.innerHTML +=
+            labels.push(
+              '<i style="background:' + getColor_cases(cases[i] + 1) + '"></i> ' +
+              '> ' + cases[i]);
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+  legend_rt = L.control({position: 'bottomright'});
+  legend_rt.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          rt = [4, 3, 2, 1, 0],
+          labels = ['<span class = "legend_title"><strong> R(t) </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < rt.length; i++) {
+          div.innerHTML +=
+            labels.push(
+              '<i style="background:' + getColor_rt(rt[i] + 1) + '"></i> ' +
+              '> ' + rt[i]);
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+legend_rt_three = L.control({position: 'bottomright'});
+  legend_rt_three.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          rt = [4, 3, 2, 1, 0],
+          labels = ['<span class = "legend_title"><strong> R(t) 3-Day Avg </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < rt.length; i++) {
+          div.innerHTML +=
+            labels.push(
+              '<i style="background:' + getColor_rt_three(rt[i] + 1) + '"></i> ' +
+              '> ' + rt[i]);
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+
+  legend_per_delta = L.control({position: 'bottomright'});
+  legend_per_delta.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          per_delta = [200, 100, 50, 20, 10, 5, 0],
+          labels = ['<span class = "legend_title"><strong> % Increase </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < per_delta.length; i++) {
+          div.innerHTML +=
+          labels.push(
+              '<i style="background:' + getColor_per_delta(per_delta[i] + 1) + '"></i> ' +
+              '> ' + per_delta[i] + '%');
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+  legend_death = L.control({position: 'bottomright'});
+  legend_death.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          death = [1000, 100, 10, 0],
+          labels = ['<span class = "legend_title"><strong> Deaths </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < death.length; i++) {
+          div.innerHTML +=
+          labels.push(
+              '<i style="background:' + getColor_death(death[i] + 1) + '"></i> ' +
+              '> ' + death[i]);
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+
+  legend_doubling = L.control({position: 'bottomright'});
+  legend_doubling.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          doubling = [2, 5, 10, 20, 20],
+          colors = ['#BD0026', '#F03B20', '#FD8D3C', '#FECC5C', '#FFFFB2']
+          labels = ['<span class = "legend_title"><strong> Days to Double </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < doubling.length; i++) {
+      	if(i == doubling.length - 1){
+      		div.innerHTML +=
+	          labels.push(
+	              '<i style="background:' + colors[i] + '"></i> ' +
+	              '>= ' + doubling[i]);
+      	} else{
+      		div.innerHTML +=
+	          labels.push(
+	              '<i style="background:' + colors[i] + '"></i> ' +
+	              '< ' + doubling[i]);
+      	}
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
+
+
+  //--------read in data and start the map--------//
+  var counties = $.ajax({
+    url:"ts.geojson",
+    dataType: "json",
+    success: console.log("County data successfully loaded."),
+    error: function (xhr) {
+      alert(xhr.statusText)
+    }
+  })
+
+  $.when(counties).done(function() {
+      
+    //start map centered on us
+    mymap = L.map('mapid').setView([38, -96], 5);
+
+    //---build layers and add them to map---//
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16
+    }).addTo(mymap);
+
+    //initialize layers
+    buildCaseLayer('case_count_20200408')
+    buildDeltaLayer('per_delta_20200407')
+    buildRtLayer('r_t_20200401')
+    buildRtThreeLayer('r_t_three_20200410')
+    buildDeathLayer('deaths_20200410')
+    buildDoublingLayer('doubling_20200420')
+    
+    //---setup layer controls---//
+    //var baseMaps = {
+    //  "Case Count": case_layer,
+    //  "% Increase": per_inc_layer,
+    //  "R(t)": rt_layer
+    //}
+    //L.control.layers(baseMaps, null, {collapsed:false}).addTo(mymap)
+    //$('.myButtonBar')[0].click()
+
+    
+    //---control which legend is shown---//
+    //start with cases
+    legend_cases.addTo(mymap);
+    
+
+  
+
+
+
+L.Control.Buttons = L.Control.extend({
+  onAdd: function(map){
+  //create div container for control
+  var div = L.DomUtil.create('div', 'myButtonBar');
+  //prevent mouse events from propagating through to the map
+  L.DomEvent.disableClickPropagation(div);
+  //create custom radio buttons
+  div.innerHTML = '<form>'
+    + '<label class="block"><input class = "base_btn" type="radio" name="radgroup" value="case_count" checked = checked>Case Count</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="per_inc">% Increase</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt">R(t) Daily</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_three">R(t) 3-Day Avg</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
+    + '</form>'
+  return div;
+  }
+})
+
+L.control.buttons = function(opts){
+  return new L.Control.Buttons(opts);
+}
+
+L.control.buttons({position: 'topright'}).addTo(mymap)
+
+
+
+
+
+
+
+
+
+L.Control.Slider = L.Control.extend({
+    onAdd: function(map) {
+      var container = L.DomUtil.create('div', 'search-container');
+      container.innerHTML = '<fieldset><div class = "controlgroup"><button id = "play" class="">&#9658;</button><div id="slider"></div></div></fieldset>';
+
+      L.DomEvent.disableClickPropagation(container);
+
+      return container;
+    },
+
+    onRemove: function(map) {
+        // Nothing to do here
+    }
+});
+
+L.control.slider = function(opts) {
+    return new L.Control.Slider(opts);
+}
+
+L.control.slider({ position: 'bottomleft' }).addTo(mymap);
+
+
+$( ".controlgroup" ).controlgroup()
+
+  String.prototype.splice = function(idx, rem, str) {
+    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+  };
+
+    var prop = counties.responseJSON.features[0].properties
+    var prop_keys = Object.keys(prop)
+    var max_date = prop_keys.slice(-1)[0].replace('r_t_three_', '')
+    var final_date = max_date.splice(4,0, '-').splice(7,0,'-')
+
+    mindate = new Date('2020-03-02').getTime();
+    maxdate = new Date(final_date).getTime() + (60 * 60 * 24 * 1000);
+    $( "#slider" ).slider({
+      range: false,
+      min: mindate,
+      max: maxdate,
+      step: 86400000,
+      value: [ mindate ],
+      create: function(event, ui){
+        setSliderTicks(event.target)
+      },
+      slide: function(event, ui){
+        var cur_date = getFormattedDate(new Date(ui.value))
+
+        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
+
+            $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
+
+      },
+      change: function(event, ui){
+
+        //get currently selected layer
+        var cur_layer = $('input[name="radgroup"]:checked').val()
+        var cur_date = getFormattedDate(new Date(ui.value))
+
+        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
+
+        $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
+
+        var d = new Date(ui.value)
+
+        var date_fixed = d.yyyymmdd()
+
+        mymap.removeLayer(case_layer)
+        mymap.removeLayer(per_inc_layer)
+        mymap.removeLayer(rt_layer)
+        mymap.removeLayer(rt_three_layer)
+        mymap.removeLayer(death_layer)
+        mymap.removeLayer(doubling_layer)
+
+        if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+        if(cur_layer == 'case_count'){
+          var data_var = "case_count_" + date_fixed
+          buildCaseLayer(data_var)
+        } else if(cur_layer == 'per_inc'){
+          var data_var = "per_delta_" + date_fixed
+          buildDeltaLayer(data_var)
+        } else if(cur_layer == 'rt'){
+          var data_var = "r_t_" + date_fixed
+          buildRtLayer(data_var)
+        } else if(cur_layer == 'rt_three'){
+          var data_var = "r_t_three_" + date_fixed
+          buildRtThreeLayer(data_var)
+        } else if(cur_layer == 'deaths'){
+          var data_var = "deaths_" + date_fixed
+          buildDeathLayer(data_var)
+        } else if(cur_layer == 'doubling'){
+          var data_var = "doubling_" + date_fixed
+          buildDoublingLayer(data_var)
+        }
+
+        //$('.leaflet-control-layers-selector')[0].setAttribute('checked',true)
+      }
+    });
+
+
+function setSliderTicks(el) {
+    var $slider =  $(el);
+    var max =  $slider.slider("option", "max");    
+    var min =  $slider.slider("option", "min");        
+    var step = $slider.slider("option", "step");
+    var spacing =  100/((max - min)/step);
+
+    $slider.find('.ui-slider-tick-mark').remove();
+    for (var i = 0; i < ((max-min)/step) ; i++) {
+        $('<span class="ui-slider-tick-mark"></span>').css('left', (spacing * i) +  '%').appendTo($slider); 
+
+        if(i == 0){
+          d = new Date(mindate)
+          d_str = getFormattedDate(d)
+          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
+        } else if(i == ((max-min)/step)-1){
+          d = new Date(maxdate)
+          d_str = getFormattedDate(d)
+          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
+
+        }
+     }
+
+
+
+}
+
+
+function getFormattedDate(date) {
+  var year = date.getFullYear();
+
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+  
+  return month + '/' + day + '/' + year;
+}
+
+   Date.prototype.yyyymmdd = function() {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+
+    return [this.getFullYear(),
+            (mm>9 ? '' : '0') + mm,
+            (dd>9 ? '' : '0') + dd
+           ].join('');
+  };
+
+  $("#play").click( function() {
+
+	mymap.removeLayer(case_layer)
+    mymap.removeLayer(per_inc_layer)
+    mymap.removeLayer(rt_layer)
+    mymap.removeLayer(rt_three_layer)
+    mymap.removeLayer(death_layer)
+    mymap.removeLayer(doubling_layer)
+
+    if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}	
+
+    current = $("#slider").slider('value')
+
+    if(current == maxdate){
+      $("#slider").slider("option", "value", mindate)
+    }
+
+    //$("#play").html('&#9612;&#9612;')
+
+    
+    int = setInterval(function(){
+      current = $("#slider").slider('value')
+      $("#slider").slider("option", "value", current + 86400000);
+
+      if ((current + 86400000) == maxdate) {
+        clearInterval(int);
+        //$("#play").html('&#9658;')
+      }
+
+    }, 20)
+    
+  })
+
+  //$("#pause").click( function() {
+//	clearInterval(int);
+  //})
+
+
+  $("#slider").slider("option", "value", maxdate)
+
+
+  //build base layer based on current selection on time slider
+    $('input[name="radgroup"]').change(function(e) { // Select the radio input group
+      var selection = $(this).val()
+
+      if(typeof testlayer !== "undefined"){
+    		mymap.removeControl(testlayer)
+    	}
+
+
+      mymap.removeLayer(case_layer)
+      mymap.removeLayer(per_inc_layer)
+      mymap.removeLayer(rt_layer)
+      mymap.removeLayer(rt_three_layer)
+      mymap.removeLayer(death_layer)
+      mymap.removeLayer(doubling_layer)
+
+      if(selection == "per_inc"){
+        var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "per_delta_" + date_fixed
+        buildDeltaLayer(data_var)
+
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        legend_per_delta.addTo(mymap);
+
+      } else if(selection == "case_count"){
+        var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "case_count_" + date_fixed
+        buildCaseLayer(data_var)
+
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        legend_cases.addTo(mymap);
+
+      } else if(selection == "rt"){
+        var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "r_t_" + date_fixed
+        buildRtLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        legend_rt.addTo(mymap);
+      } else if(selection == 'rt_three'){
+      	var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "r_t_three_" + date_fixed
+        buildRtThreeLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        legend_rt_three.addTo(mymap);
+      } else if(selection == 'deaths'){
+      	var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "deaths_" + date_fixed
+        buildDeathLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_doubling)
+        legend_death.addTo(mymap);
+      } else if(selection == 'doubling'){
+      	var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "doubling_" + date_fixed
+        buildDoublingLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_death)
+        legend_doubling.addTo(mymap);
+      }
+
+
+
+
+
+
+    });
+
+
+
+
+  });
+
+  //resize map height to full page
+  $(window).on("resize", function () { $("#mapid").height($(window).height()); }).trigger("resize");
+
+
+
+  
+
+  </script>
+
+
+
+
+
+
+
+
+
+</html>
