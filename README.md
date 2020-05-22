@@ -6,6 +6,8 @@ Bigmap is an exploratory data analysis tool that provides a map interface for vi
 
 Bigmap provides a timeline view that allows users to see the progression of confirmed COVID19 infections by county from March 1, 2020 to present.
 
+![bigmap](bigmap.png)
+
 ## Installation
 
 Download or git clone the project to a local system.  Move the entire project to a directory that is served up by a web server, such as [nginx](http://nginx.org/en/docs/windows.html).
