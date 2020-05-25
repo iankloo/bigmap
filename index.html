@@ -280,6 +280,15 @@
                       '#808080';
   }
 
+  function getColor_rt_seven(d) {
+    return d > 4 ? '#BD0026' :
+           d > 3  ? '#F03B20' :
+           d > 2   ? '#FD8D3C' :
+           d > 1   ? '#FECC5C' :
+           d > 0   ? '#FFFFB2'  :
+                      '#808080';
+  }
+
   function getColor_death(d) {
     return d > 1000 ? '#BD0026' :
            d > 100  ? '#F03B20' :
@@ -808,6 +817,127 @@ function buildRtThreeLayer(my_data_var){
   }
 
 
+  function buildRtSevenLayer(my_data_var){
+
+    function resetHighlight_rt_seven(e) {
+      rt_seven_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_rt_seven(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight_rt_seven
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>R(t) 7-Day Avg: ' + feature.properties[my_data_var])
+    }
+
+    function style_rt_seven(feature){
+      return{
+        fillColor: getColor_rt_seven(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    rt_seven_layer = L.geoJSON(counties.responseJSON, {
+      style: style_rt_seven,
+      onEachFeature: onEachFeature_rt_seven
+    }).addTo(mymap);
+
+
+    rt_seven_layer.on('click', function(e){
+
+      if(typeof testlayer !== "undefined"){
+        mymap.removeControl(testlayer)
+      }
+
+    L.Control.Plot = L.Control.extend({
+    onAdd: function(map) {
+        var container = L.DomUtil.create('div', 'search-container');
+        container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+        //L.DomEvent.disableClickPropagation(container);
+
+        return container;
+      },
+
+      onRemove: function(map) {
+          // Nothing to do here
+        }
+    })
+
+    L.control.plot = function(opts){
+      return new L.Control.Plot(opts)
+    }
+
+
+    testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+    sub_dat = counties.responseJSON.features.filter(function(d){
+      return d.properties.FIPS == e.layer.feature.properties.FIPS
+    })
+
+    props = Object.getOwnPropertyNames(sub_dat[0].properties)
+    my_props = props.filter(s => s.includes('r_t_seven'));
+
+    filtered = Object.keys(sub_dat[0].properties)
+      .filter(key => my_props.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = sub_dat[0].properties[key];
+        return obj;
+      }, {});
+
+     plot_dat = Object.values(filtered)
+
+     dates = my_props.map(function(x){return x.replace('r_t_seven_', '');});
+     dates = dates.map(function(x){return x.splice(4,0, '-').splice(7,0,'-')})
+
+
+    //console.log(e.layer.feature.properties.FIPS)
+
+    var myChart = echarts.init(document.getElementById('main'));
+
+        // specify chart configuration item and data
+        var option = {
+            title: {
+                text: 'Timeseries of R(t) (7 Day Moving Average) \nin ' + sub_dat[0].properties.NAME + ' County'
+            },
+            toolbox: {
+               bottom: '0px',
+             feature: {
+                 saveAsImage : {show: true, title: " "}
+
+             }
+         },
+            tooltip: {trigger:"axis"},
+            xAxis: {
+                data: dates
+            },
+            yAxis: {
+              max: 10
+            },
+            series: [{
+                name: 'R(t)',
+                type: 'line',
+                data: plot_dat
+            }]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+
+
+        $("#x").click(function(){
+        mymap.removeControl(testlayer)
+      })
+
+  })
+
+  }
+
+
   function buildDeathLayer(my_data_var){
 
     function resetHighlight_death(e) {
@@ -920,7 +1050,6 @@ function buildRtThreeLayer(my_data_var){
 
         $("#x").click(function(){
     		mymap.removeControl(testlayer)
-    		console.log('clicked')
     	})
 
 	})
@@ -1105,6 +1234,25 @@ legend_rt_three = L.control({position: 'bottomright'});
       return div;
   };
 
+  legend_rt_seven = L.control({position: 'bottomright'});
+    legend_rt_seven.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend'),
+            rt = [4, 3, 2, 1, 0],
+            labels = ['<span class = "legend_title"><strong> R(t) 7-Day Avg </strong></span>'];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < rt.length; i++) {
+            div.innerHTML +=
+              labels.push(
+                '<i style="background:' + getColor_rt_seven(rt[i] + 1) + '"></i> ' +
+                '> ' + rt[i]);
+        }
+        div.innerHTML +=
+          labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        div.innerHTML = labels.join('<br>');
+        return div;
+  };
+
 
   legend_per_delta = L.control({position: 'bottomright'});
   legend_per_delta.onAdd = function (map) {
@@ -1200,6 +1348,7 @@ legend_rt_three = L.control({position: 'bottomright'});
     buildDeltaLayer('per_delta_20200407')
     buildRtLayer('r_t_20200401')
     buildRtThreeLayer('r_t_three_20200410')
+    buildRtSevenLayer('r_t_seven_20200410')
     buildDeathLayer('deaths_20200410')
     buildDoublingLayer('doubling_20200420')
     
@@ -1234,6 +1383,7 @@ L.Control.Buttons = L.Control.extend({
     + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="per_inc">% Increase</label>'
     + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt">R(t) Daily</label>'
     + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_three">R(t) 3-Day Avg</label>'
+    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_seven">R(t) 7-Day Avg</label>'
     + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
     + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
     + '</form>'
@@ -1325,6 +1475,7 @@ $( ".controlgroup" ).controlgroup()
         mymap.removeLayer(per_inc_layer)
         mymap.removeLayer(rt_layer)
         mymap.removeLayer(rt_three_layer)
+        mymap.removeLayer(rt_seven_layer)
         mymap.removeLayer(death_layer)
         mymap.removeLayer(doubling_layer)
 
@@ -1350,6 +1501,9 @@ $( ".controlgroup" ).controlgroup()
         } else if(cur_layer == 'doubling'){
           var data_var = "doubling_" + date_fixed
           buildDoublingLayer(data_var)
+        } else if(cur_layer == 'rt_seven'){
+          var data_var = "r_t_seven_" + date_fixed
+          buildRtSevenLayer(data_var)
         }
 
         //$('.leaflet-control-layers-selector')[0].setAttribute('checked',true)
@@ -1413,6 +1567,7 @@ function getFormattedDate(date) {
     mymap.removeLayer(per_inc_layer)
     mymap.removeLayer(rt_layer)
     mymap.removeLayer(rt_three_layer)
+    mymap.removeLayer(rt_seven_layer)
     mymap.removeLayer(death_layer)
     mymap.removeLayer(doubling_layer)
 
@@ -1463,6 +1618,7 @@ function getFormattedDate(date) {
       mymap.removeLayer(per_inc_layer)
       mymap.removeLayer(rt_layer)
       mymap.removeLayer(rt_three_layer)
+      mymap.removeLayer(rt_seven_layer)
       mymap.removeLayer(death_layer)
       mymap.removeLayer(doubling_layer)
 
@@ -1475,6 +1631,7 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_rt)
         mymap.removeControl(legend_cases)
         mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         legend_per_delta.addTo(mymap);
@@ -1488,6 +1645,7 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_rt)
         mymap.removeControl(legend_per_delta)
         mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         legend_cases.addTo(mymap);
@@ -1501,6 +1659,7 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_per_delta)
         mymap.removeControl(legend_cases)
         mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         legend_rt.addTo(mymap);
@@ -1513,9 +1672,23 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_per_delta)
         mymap.removeControl(legend_cases)
         mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         legend_rt_three.addTo(mymap);
+      } else if(selection == 'rt_seven'){
+        var d = new Date($("#slider").slider("value"))
+        var date_fixed = d.yyyymmdd()
+        var data_var = "r_t_seven_" + date_fixed
+        buildRtSevenLayer(data_var)
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        legend_rt_seven.addTo(mymap);
       } else if(selection == 'deaths'){
       	var d = new Date($("#slider").slider("value"))
         var date_fixed = d.yyyymmdd()
@@ -1526,6 +1699,7 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_cases)
         mymap.removeControl(legend_rt)
         mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_doubling)
         legend_death.addTo(mymap);
       } else if(selection == 'doubling'){
@@ -1538,6 +1712,7 @@ function getFormattedDate(date) {
         mymap.removeControl(legend_cases)
         mymap.removeControl(legend_rt)
         mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         legend_doubling.addTo(mymap);
       }
