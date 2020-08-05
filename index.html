@@ -380,6 +380,9 @@
 
 
 
+
+
+
 function openNav() {
   if(document.getElementById("Btn2").style.marginRight == "50%"){
     document.getElementById("mySidebar").style.width = "0";
@@ -1514,225 +1517,249 @@ legend_rt_three = L.control({position: 'bottomright'});
 
 
 
+
+
+
+
   //--------read in data and start the map--------//
-  $.ajax({
-    url:"geojsons/20200727.geojson",
-    dataType: "json",
-    success: function(data){
-    	//counties = data
-    	//start map centered on us
-		mymap = L.map('mapid').setView([38, -96], 5);
 
-		//---build layers and add them to map---//
-		L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-		  attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-		  maxZoom: 16
-		}).addTo(mymap);
+
+	$.ajax({
+	  url: "geojsons/",
+	  success: function(data){
+	  	var last = $(data).find('tr:last > td > a').text()
+
+	  	var last_date = last.replace('.geojson', '')
+	  	
 
 
 
+	  	$.ajax({
+		    url:"geojsons/" + last_date + ".geojson",
+		    dataType: "json",
+		    success: function(data){
+		    	//counties = data
+		    	//start map centered on us
+				mymap = L.map('mapid').setView([38, -96], 5);
 
-		L.Control.Buttons = L.Control.extend({
-		  onAdd: function(map){
-		  //create div container for control
-		  var div = L.DomUtil.create('div', 'myButtonBar');
-		  //prevent mouse events from propagating through to the map
-		  L.DomEvent.disableClickPropagation(div);
-		  //create custom radio buttons
-		  div.innerHTML = '<form>'
-		    + '<label class="block"><input class = "base_btn" type="radio" name="radgroup" value="case_count" checked = checked>Case Count</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="per_inc">% Increase</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt">R(t) Daily</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_three">R(t) 3-Day Avg</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_seven">R(t) 7-Day Avg</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
-		    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="infectprob">Infectious Probability</label>'
-		    + '</form>'
-		  return div;
-		  }
-		})
-
-		L.control.buttons = function(opts){
-		  return new L.Control.Buttons(opts);
-		}
-
-		L.control.buttons({position: 'topright'}).addTo(mymap)
-
-		  $('input[name="radgroup"]').change(function(e) {
-		  	//console.log($(this).val())
-		 //  	mymap.eachLayer(function (layer) {
-		 //  		console.log(layer)
-			//     mymap.removeLayer(layer);
-			// });
-		  	build_map(data, $(this).val())
-		  })
+				//---build layers and add them to map---//
+				L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+				  attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+				  maxZoom: 16
+				}).addTo(mymap);
 
 
-		L.Control.Slider = L.Control.extend({
-    		onAdd: function(map) {
-		      var container = L.DomUtil.create('div', 'search-container');
-		      container.innerHTML = '<fieldset><div class = "controlgroup"><button id = "play" class="">&#9658;</button><div id="slider"></div></div></fieldset>';
-
-		      L.DomEvent.disableClickPropagation(container);
-
-		      return container;
-		    },
-
-		    onRemove: function(map) {
-		        // Nothing to do here
-		    }
-		});
-
-		L.control.slider = function(opts) {
-		    return new L.Control.Slider(opts);
-		}
-
-		L.control.slider({ position: 'bottomleft' }).addTo(mymap);
 
 
-		$( ".controlgroup" ).controlgroup()
+				L.Control.Buttons = L.Control.extend({
+				  onAdd: function(map){
+				  //create div container for control
+				  var div = L.DomUtil.create('div', 'myButtonBar');
+				  //prevent mouse events from propagating through to the map
+				  L.DomEvent.disableClickPropagation(div);
+				  //create custom radio buttons
+				  div.innerHTML = '<form>'
+				    + '<label class="block"><input class = "base_btn" type="radio" name="radgroup" value="case_count" checked = checked>Case Count</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="per_inc">% Increase</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt">R(t) Daily</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_three">R(t) 3-Day Avg</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_seven">R(t) 7-Day Avg</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="infectprob">Infectious Probability</label>'
+				    + '</form>'
+				  return div;
+				  }
+				})
 
-		  String.prototype.splice = function(idx, rem, str) {
-		    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
-		  };
+				L.control.buttons = function(opts){
+				  return new L.Control.Buttons(opts);
+				}
+
+				L.control.buttons({position: 'topright'}).addTo(mymap)
+
+				  $('input[name="radgroup"]').change(function(e) {
+				  	//console.log($(this).val())
+				 //  	mymap.eachLayer(function (layer) {
+				 //  		console.log(layer)
+					//     mymap.removeLayer(layer);
+					// });
+				  	build_map(data, $(this).val())
+				  })
 
 
-		    mindate = new Date('2020-03-02').getTime();
-		    maxdate = new Date('2020-08-04').getTime();
-		    $( "#slider" ).slider({
-		      range: false,
-		      min: mindate,
-		      max: maxdate,
-		      step: 86400000,
-		      value: [ mindate ],
-		      create: function(event, ui){
-		        setSliderTicks(event.target)
-		      },
-		      slide: function(event, ui){
-		        var cur_date = getFormattedDate(new Date(ui.value))
+				L.Control.Slider = L.Control.extend({
+		    		onAdd: function(map) {
+				      var container = L.DomUtil.create('div', 'search-container');
+				      container.innerHTML = '<fieldset><div class = "controlgroup"><button id = "play" class="">&#9658;</button><div id="slider"></div></div></fieldset>';
 
-		        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
+				      L.DomEvent.disableClickPropagation(container);
 
-		            $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
-
-		      },
-		      change: function(event, ui){
-
-		        //get currently selected layer
-		        var cur_layer = $('input[name="radgroup"]:checked').val()
-		        var cur_date = getFormattedDate(new Date(ui.value))
-
-		        var d = new Date(ui.value)
-		        var date_fixed = d.yyyymmdd()
-
-		        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
-
-		        $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
-
-		        $.ajax({
-				    url:"geojsons/"+date_fixed+".geojson",
-				    dataType: "json",
-				    success: function(data){
-				    	build_map(data, cur_layer)
+				      return container;
 				    },
-				    error: function (xhr) {
-				      alert(xhr.statusText)
+
+				    onRemove: function(map) {
+				        // Nothing to do here
 				    }
-				 })
+				});
 
-		     
-		      }
-		    });
+				L.control.slider = function(opts) {
+				    return new L.Control.Slider(opts);
+				}
 
-
-		function setSliderTicks(el) {
-		    var $slider =  $(el);
-		    var max =  $slider.slider("option", "max");    
-		    var min =  $slider.slider("option", "min");        
-		    var step = $slider.slider("option", "step");
-		    var spacing =  100/((max - min)/step);
-
-		    $slider.find('.ui-slider-tick-mark').remove();
-		    for (var i = 0; i < ((max-min)/step) ; i++) {
-		        $('<span class="ui-slider-tick-mark"></span>').css('left', (spacing * i) +  '%').appendTo($slider); 
-
-		        if(i == 0){
-		          d = new Date(mindate)
-		          d_str = getFormattedDate(d)
-		          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
-		        } else if(i == ((max-min)/step)-1){
-		          d = new Date(maxdate)
-		          d_str = getFormattedDate(d)
-		          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
-
-		        }
-		     }
-		 }
+				L.control.slider({ position: 'bottomleft' }).addTo(mymap);
 
 
-		 function getFormattedDate(date) {
-			  var year = date.getFullYear();
+				$( ".controlgroup" ).controlgroup()
 
-			  var month = (1 + date.getMonth()).toString();
-			  month = month.length > 1 ? month : '0' + month;
-
-			  var day = date.getDate().toString();
-			  day = day.length > 1 ? day : '0' + day;
-			  
-			  return month + '/' + day + '/' + year;
-			}
-
-		Date.prototype.yyyymmdd = function() {
-		    var mm = this.getMonth() + 1; // getMonth() is zero-based
-		    var dd = this.getDate();
-
-		    return [this.getFullYear(),
-		            (mm>9 ? '' : '0') + mm,
-		            (dd>9 ? '' : '0') + dd
-		           ].join('');
-		  };
+				  String.prototype.splice = function(idx, rem, str) {
+				    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+				  };
 
 
-		  $("#play").click( function() {
+				    mindate = new Date('2020-03-02').getTime();
+				    maxdate = new Date(last_date.slice(0, 4) + "-" + last_date.slice(4, 6) + "-" + last_date.slice(6, 8)).getTime() + 86400000
 
-		    current = $("#slider").slider('value')
+				    $( "#slider" ).slider({
+				      range: false,
+				      min: mindate,
+				      max: maxdate,
+				      step: 86400000,
+				      value: [ mindate ],
+				      create: function(event, ui){
+				        setSliderTicks(event.target)
+				      },
+				      slide: function(event, ui){
+				        var cur_date = getFormattedDate(new Date(ui.value))
 
-		    if(current == maxdate){
-		      $("#slider").slider("option", "value", mindate)
+				        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
+
+				            $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
+
+				      },
+				      change: function(event, ui){
+
+				        //get currently selected layer
+				        var cur_layer = $('input[name="radgroup"]:checked').val()
+				        var cur_date = getFormattedDate(new Date(ui.value))
+
+				        var d = new Date(ui.value)
+				        var date_fixed = d.yyyymmdd()
+
+				        var tooltip = '<div class="tooltip_custom"><div class="tooltip-inner">' + cur_date + '</div><div class="tooltip-arrow"></div></div>';
+
+				        $('.ui-slider-handle').html(tooltip); //attach tooltip to the slider handle
+
+				        $.ajax({
+						    url:"geojsons/"+date_fixed+".geojson",
+						    dataType: "json",
+						    success: function(data){
+						    	build_map(data, cur_layer)
+						    },
+						    error: function (xhr) {
+						      alert(xhr.statusText)
+						    }
+						 })
+
+				     
+				      }
+				    });
+
+
+				function setSliderTicks(el) {
+				    var $slider =  $(el);
+				    var max =  $slider.slider("option", "max");    
+				    var min =  $slider.slider("option", "min");        
+				    var step = $slider.slider("option", "step");
+				    var spacing =  100/((max - min)/step);
+
+				    $slider.find('.ui-slider-tick-mark').remove();
+				    for (var i = 0; i < ((max-min)/step) ; i++) {
+				        $('<span class="ui-slider-tick-mark"></span>').css('left', (spacing * i) +  '%').appendTo($slider); 
+
+				        if(i == 0){
+				          d = new Date(mindate)
+				          d_str = getFormattedDate(d)
+				          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
+				        } else if(i == ((max-min)/step)-1){
+				          d = new Date(maxdate)
+				          d_str = getFormattedDate(d)
+				          var el = $('<label>' + d_str + '</label>').css('left', (spacing * i) + '%').appendTo($slider);
+
+				        }
+				     }
+				 }
+
+
+				 function getFormattedDate(date) {
+					  var year = date.getFullYear();
+
+					  var month = (1 + date.getMonth()).toString();
+					  month = month.length > 1 ? month : '0' + month;
+
+					  var day = date.getDate().toString();
+					  day = day.length > 1 ? day : '0' + day;
+					  
+					  return month + '/' + day + '/' + year;
+					}
+
+				Date.prototype.yyyymmdd = function() {
+				    var mm = this.getMonth() + 1; // getMonth() is zero-based
+				    var dd = this.getDate();
+
+				    return [this.getFullYear(),
+				            (mm>9 ? '' : '0') + mm,
+				            (dd>9 ? '' : '0') + dd
+				           ].join('');
+				  };
+
+
+				  $("#play").click( function() {
+
+				    current = $("#slider").slider('value')
+
+				    if(current == maxdate){
+				      $("#slider").slider("option", "value", mindate)
+				    }
+
+				    //$("#play").html('&#9612;&#9612;')
+
+				    
+				    int = setInterval(function(){
+				      current = $("#slider").slider('value')
+				      $("#slider").slider("option", "value", current + 86400000);
+
+				      if ((current + 86400000) == maxdate) {
+				        clearInterval(int);
+				        //$("#play").html('&#9658;')
+				      }
+
+				    }, 750)
+				    
+				  })
+
+
+
+
+
+				$("#slider").slider("option", "value", maxdate)
+
+
+
+
+		    	//build_map(data, 'case_count')
+		    },
+		    error: function (xhr) {
+		      alert(xhr.statusText)
 		    }
-
-		    //$("#play").html('&#9612;&#9612;')
-
-		    
-		    int = setInterval(function(){
-		      current = $("#slider").slider('value')
-		      $("#slider").slider("option", "value", current + 86400000);
-
-		      if ((current + 86400000) == maxdate) {
-		        clearInterval(int);
-		        //$("#play").html('&#9658;')
-		      }
-
-		    }, 750)
-		    
 		  })
+	  }
+	});
 
 
 
 
-
-		$("#slider").slider("option", "value", maxdate)
-
-
-
-
-    	//build_map(data, 'case_count')
-    },
-    error: function (xhr) {
-      alert(xhr.statusText)
-    }
-  })
+  
 
 
 	// $.when(counties).done(function() {
