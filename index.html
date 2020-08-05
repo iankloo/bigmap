@@ -1524,14 +1524,14 @@ legend_rt_three = L.control({position: 'bottomright'});
   //--------read in data and start the map--------//
 
 
-	$.ajax({
-	  url: "geojsons/",
-	  success: function(data){
-	  	var last = $(data).find('tr:last > td > a').text()
+	// $.ajax({
+	//   url: "geojsons/",
+	//   success: function(data){
+	//   	var last = $(data).find('tr:last > td > a').text()
 
-	  	var last_date = last.replace('.geojson', '')
+	//   	var last_date = last.replace('.geojson', '')
 	  	
-
+	  	var last_date = '20200804'
 
 
 	  	$.ajax({
@@ -1753,8 +1753,8 @@ legend_rt_three = L.control({position: 'bottomright'});
 		      alert(xhr.statusText)
 		    }
 		  })
-	  }
-	});
+	//   }
+	// });
 
 
 
