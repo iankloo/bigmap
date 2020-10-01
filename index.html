@@ -491,11 +491,17 @@ function closeNav() {
   // }
 
     function getColor_infectprob(d) {
-      return d > 10 ? '#BD0026' :
-             d > 5  ? '#F03B20' :
-             d > 2  ? '#FD8D3C' :
-             d > 1   ? '#FECC5C' :
-             d > 0   ? '#FFFFB2' :
+      return d > 10 ? '#800026' :
+             d > 9  ? '#B10026' :
+             d > 8  ? '#D41121' :
+             d > 7   ? '#ED3321' :
+             d > 6   ? '#FD5D2D' :
+             d > 5   ? '#FD8D3C' :
+             d > 4   ? '#FEAB49' :
+             d > 3   ? '#FFC965' :
+             d > 2   ? '#FFE187' :
+             d > 1   ? '#FFF1A9' :
+             d > 0   ? '#FFFFCC' :
                         '#808080';
     }
     
@@ -1499,7 +1505,7 @@ legend_rt_three = L.control({position: 'bottomright'});
   legend_infectprob = L.control({position: 'bottomright'});
     legend_infectprob.onAdd = function (map) {
       var div = L.DomUtil.create('div', 'info legend'),
-          infectprob = [10, 5, 2, 1, 0],
+          infectprob = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
           labels = ['<span class = "legend_title"><strong> Infectious Probability </strong></span>'];
 
       // loop through our density intervals and generate a label with a colored square for each interval
@@ -1530,7 +1536,7 @@ legend_rt_three = L.control({position: 'bottomright'});
 
 	//   	var last_date = last.replace('.geojson', '')
 	  	
-	  	var last_date = '20200928'
+	  	var last_date = '20200930'
 
 
 	  	$.ajax({
