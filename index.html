@@ -1564,14 +1564,14 @@ legend_rt_three = L.control({position: 'bottomright'});
 				  L.DomEvent.disableClickPropagation(div);
 				  //create custom radio buttons
 				  div.innerHTML = '<form>'
-				    + '<label class="block"><input class = "base_btn" type="radio" name="radgroup" value="case_count" checked = checked>Case Count</label>'
+				    + '<label class="block"><input class = "base_btn" type="radio" name="radgroup" value="case_count">Case Count</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="per_inc">% Increase</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt">R(t) Daily</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_three">R(t) 3-Day Avg</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_seven">R(t) 7-Day Avg</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
-				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="infectprob">Infectious Probability</label>'
+				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="infectprob" checked = checked>Infectious Probability</label>'
 				    + '</form>'
 				  return div;
 				  }
