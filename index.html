@@ -423,12 +423,12 @@ function closeNav() {
   } 
 
   function getColor_per_delta(d) {
-      return d > 200 ? '#800026' :
-             d > 100  ? '#BD0026' :
-             d > 50  ? '#E31A1C' :
-             d > 20  ? '#FC4E2A' :
-             d > 10   ? '#FD8D3C' :
-             d > 5   ? '#FEB24C' :
+      return d > 20 ? '#800026' :
+             d > 10  ? '#BD0026' :
+             d > 5  ? '#E31A1C' :
+             d > 2  ? '#FC4E2A' :
+             d > 1  ? '#FD8D3C' :
+             d > .5   ? '#FEB24C' :
              d > 0   ? '#FED976' :
                         '#808080';
     } 
@@ -490,6 +490,17 @@ function closeNav() {
 
   }
 
+  function getColor_seven_day_percap(d) {
+    return d > 2000 ? '#800026' :
+           d > 1500  ? '#B10026' :
+           d > 1000  ? '#D41121' :
+           d > 500  ? '#FD5D2D' :
+           d > 250  ? '#FEAB49' :
+           d > 100   ? '#FFE187' :
+           d > 0   ? '#FFFFCC' :
+                      '#808080';
+  } 
+
 
   //   function getColor_infectprob(d) {
   //   return d > 5 ? '#BD0026' :
@@ -533,6 +544,116 @@ function closeNav() {
     }
 
   }
+
+  function buildPercapLayer(my_data_var){
+
+    function resetHighlight_percap(e) {
+      percap_layer.resetStyle(e.target);
+    }
+
+    function onEachFeature_percap(feature, layer) {
+      layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight_percap
+      });
+      layer.bindTooltip('<b>'+feature.properties.NAME + '</b><br>7-Day Cases Per 100k: ' + feature.properties[my_data_var])
+    }
+
+    function style_percap(feature){
+      return{
+        fillColor: getColor_seven_day_percap(feature.properties[my_data_var]),
+        weight: .2,
+        opacity: 1,
+        color: 'grey',
+        fillOpacity: 0.7
+      }
+    }
+
+    percap_layer = L.geoJSON(counties, {
+      style: style_percap,
+      onEachFeature: onEachFeature_percap
+    }).addTo(mymap);
+
+    percap_layer.on('click', function(e){
+
+      if(typeof testlayer !== "undefined"){
+        mymap.removeControl(testlayer)
+      }
+
+
+      L.Control.Plot = L.Control.extend({
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'search-container');
+            container.innerHTML = '<div class = "info"> <button id = "x">X</button><div id="main" style="width:450px; height:275px;"></div> </div>';
+
+            //L.DomEvent.disableClickPropagation(container);
+
+            return container;
+          },
+
+          onRemove: function(map) {
+              // Nothing to do here
+            }
+      })
+
+
+
+      L.control.plot = function(opts){
+        return new L.Control.Plot(opts)
+      }
+
+      $.ajax({
+        url:"chart_data/"+e.layer.feature.properties.FIPS+".json",
+        dataType: "json",
+        success: function(d){
+          console.log(d)
+
+          var plot_dat = d.map(a => a.seven_day_percap);
+          var dates = d.map(a => a.date)
+
+          testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
+
+          var myChart = echarts.init(document.getElementById('main'));
+
+            // specify chart configuration item and data
+            var option = {
+                title: {
+                    text: 'Timeseries of 7-Day Cases Per 100k in ' + d[0]['County Name']
+                },
+                toolbox: {
+                   bottom: '0px',
+                 feature: {
+                     saveAsImage : {show: true, title: " "}
+
+                 }
+             },
+                tooltip: {trigger:"axis"},
+                xAxis: {
+                    data: dates
+                },
+                yAxis: {},
+                series: [{
+                    name: 'Cases',
+                    type: 'line',
+                    data: plot_dat
+                }]
+            };
+
+            // use configuration item and data specified to show chart
+            myChart.setOption(option);
+
+
+            $("#x").click(function(){
+            mymap.removeControl(testlayer)
+          })
+        }
+    })
+
+
+    })
+
+  }
+
 
   function buildCaseLayer(my_data_var){
 
@@ -701,7 +822,7 @@ function closeNav() {
 		    dataType: "json",
 		    success: function(d){
 
-		    	var plot_dat = d.map(a => a.delta);
+		    	var plot_dat = d.map(a => a.per_delta * 100);
 		    	var dates = d.map(a => a.date)
 
 		    	testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
@@ -1449,7 +1570,7 @@ legend_rt_three = L.control({position: 'bottomright'});
   legend_per_delta = L.control({position: 'bottomright'});
   legend_per_delta.onAdd = function (map) {
       var div = L.DomUtil.create('div', 'info legend'),
-          per_delta = [200, 100, 50, 20, 10, 5, 0],
+          per_delta = [10, 5, 2, 1, .5, 0],
           labels = ['<span class = "legend_title"><strong> % Increase </strong></span>'];
 
       // loop through our density intervals and generate a label with a colored square for each interval
@@ -1460,7 +1581,7 @@ legend_rt_three = L.control({position: 'bottomright'});
               '> ' + per_delta[i] + '%');
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "0% or NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1531,6 +1652,25 @@ legend_rt_three = L.control({position: 'bottomright'});
       return div;
   };
 
+  legend_percap = L.control({position: 'bottomright'});
+    legend_percap.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          percap = [2000, 1500, 1000, 500, 250, 100, 0],
+          labels = ['<span class = "legend_title"><strong> 7-Day Cases Per 100k </strong></span>'];
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < percap.length; i++) {
+          div.innerHTML +=
+            labels.push(
+              '<i style="background:' + getColor_seven_day_percap(percap[i] + 1) + '"></i> ' +
+              '> ' + percap[i]);
+      }
+      div.innerHTML +=
+        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+      div.innerHTML = labels.join('<br>');
+      return div;
+  };
+
  
 
 
@@ -1581,6 +1721,7 @@ legend_rt_three = L.control({position: 'bottomright'});
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="rt_seven">R(t) 7-Day Avg</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="deaths">Deaths</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="doubling">Doubling</label>'
+            + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="percap">7-Day Cases per 100k</label>'
 				    + '<label class="block base_btn"><input class = "base_btn" type="radio" name="radgroup" value="infectprob" checked = checked>Infectious Probability</label>'
 				    + '</form>'
 				  return div;
@@ -1818,6 +1959,8 @@ legend_rt_three = L.control({position: 'bottomright'});
     	mymap.removeLayer(doubling_layer)
     }if(typeof(infectprob_layer) !== 'undefined'){
     	mymap.removeLayer(infectprob_layer)
+    }if(typeof(percap_layer) !== 'undefined'){
+      mymap.removeLayer(percap_layer)
     }
 
       // mymap.removeLayer(case_layer)
@@ -1833,13 +1976,14 @@ legend_rt_three = L.control({position: 'bottomright'});
 
         buildDeltaLayer('per_delta')
 
-        // mymap.removeControl(legend_rt)
-        // mymap.removeControl(legend_cases)
-        // mymap.removeControl(legend_rt_three)
-        // mymap.removeControl(legend_rt_seven)
-        // mymap.removeControl(legend_death)
-        // mymap.removeControl(legend_doubling)
-        // mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_per_delta.addTo(mymap);
 
       } else if(selection == "case_count"){
@@ -1853,6 +1997,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_cases.addTo(mymap);
 
       } else if(selection == "rt"){
@@ -1865,6 +2010,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_rt.addTo(mymap);
       } else if(selection == 'rt_three'){
 
@@ -1877,6 +2023,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_rt_three.addTo(mymap);
       } else if(selection == 'rt_seven'){
 
@@ -1889,6 +2036,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_rt_seven.addTo(mymap);
       } else if(selection == 'deaths'){
 
@@ -1901,6 +2049,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_doubling)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_death.addTo(mymap);
       } else if(selection == 'doubling'){
 
@@ -1913,6 +2062,7 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_infectprob)
+        mymap.removeControl(legend_percap)
         legend_doubling.addTo(mymap);
       } else if(selection == 'infectprob'){
 
@@ -1925,7 +2075,21 @@ legend_rt_three = L.control({position: 'bottomright'});
         mymap.removeControl(legend_rt_seven)
         mymap.removeControl(legend_death)
         mymap.removeControl(legend_doubling)
+        mymap.removeControl(legend_percap)
         legend_infectprob.addTo(mymap);
+      } else if(selection == 'percap'){
+
+        buildPercapLayer('seven_day_percap')
+
+        mymap.removeControl(legend_per_delta)
+        mymap.removeControl(legend_cases)
+        mymap.removeControl(legend_rt)
+        mymap.removeControl(legend_rt_three)
+        mymap.removeControl(legend_rt_seven)
+        mymap.removeControl(legend_death)
+        mymap.removeControl(legend_doubling)
+        mymap.removeControl(legend_infectprob)
+        legend_percap.addTo(mymap);
       }
 
      //});
