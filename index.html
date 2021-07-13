@@ -512,17 +512,17 @@ function closeNav() {
   // }
 
     function getColor_infectprob(d) {
-      return d > 10 ? '#800026' :
-             d > 9  ? '#B10026' :
-             d > 8  ? '#D41121' :
-             d > 7   ? '#ED3321' :
-             d > 6   ? '#FD5D2D' :
-             d > 5   ? '#FD8D3C' :
-             d > 4   ? '#FEAB49' :
-             d > 3   ? '#FFC965' :
-             d > 2   ? '#FFE187' :
-             d > 1   ? '#FFF1A9' :
-             d > 0   ? '#FFFFCC' :
+      return d >= 10 ? '#800026' :
+             d >= 9  ? '#B10026' :
+             d >= 8  ? '#D41121' :
+             d >= 7   ? '#ED3321' :
+             d >= 6   ? '#FD5D2D' :
+             d >= 5   ? '#FD8D3C' :
+             d >= 4   ? '#FEAB49' :
+             d >= 3   ? '#FFC965' :
+             d >= 2   ? '#FFE187' :
+             d >= 1   ? '#FFF1A9' :
+             d >= 0   ? '#FFFFCC' :
                         '#808080';
     }
     
@@ -1644,10 +1644,10 @@ legend_rt_three = L.control({position: 'bottomright'});
           div.innerHTML +=
             labels.push(
               '<i style="background:' + getColor_infectprob(infectprob[i] + 1) + '"></i> ' +
-              '> ' + infectprob[i] + '%');
+              '>= ' + infectprob[i] + '%');
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0% or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
