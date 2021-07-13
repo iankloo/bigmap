@@ -414,49 +414,49 @@ function closeNav() {
 
   //--------colors for each layer--------//
   function getColor_cases(d) {
-    return d > 10000 ? '#BD0026' :
-           d > 1000  ? '#F03B20' :
-           d > 100   ? '#FD8D3C' :
-           d > 10   ? '#FECC5C' :
-           d > 0    ? '#FFFFB2' :
+    return d >= 10000 ? '#BD0026' :
+           d >= 1000  ? '#F03B20' :
+           d >= 100   ? '#FD8D3C' :
+           d >= 10   ? '#FECC5C' :
+           d >= 0    ? '#FFFFB2' :
                       '#808080';
   } 
 
   function getColor_per_delta(d) {
-      return d > 20 ? '#800026' :
-             d > 10  ? '#BD0026' :
-             d > 5  ? '#E31A1C' :
-             d > 2  ? '#FC4E2A' :
-             d > 1  ? '#FD8D3C' :
-             d > .5   ? '#FEB24C' :
-             d > 0   ? '#FED976' :
+      return d >= 20 ? '#800026' :
+             d >= 10  ? '#BD0026' :
+             d >= 5  ? '#E31A1C' :
+             d >= 2  ? '#FC4E2A' :
+             d >= 1  ? '#FD8D3C' :
+             d >= .5   ? '#FEB24C' :
+             d >= 0   ? '#FED976' :
                         '#808080';
     } 
 
   function getColor_rt(d) {
-    return d > 4 ? '#BD0026' :
-           d > 3  ? '#F03B20' :
-           d > 2   ? '#FD8D3C' :
-           d > 1   ? '#FECC5C' :
-           d > 0   ? '#FFFFB2'  :
+    return d >= 4 ? '#BD0026' :
+           d >= 3  ? '#F03B20' :
+           d >= 2   ? '#FD8D3C' :
+           d >= 1   ? '#FECC5C' :
+           d >= 0   ? '#FFFFB2'  :
                       '#808080';
   }
 
   function getColor_rt_three(d) {
-    return d > 4 ? '#BD0026' :
-           d > 3  ? '#F03B20' :
-           d > 2   ? '#FD8D3C' :
-           d > 1   ? '#FECC5C' :
-           d > 0   ? '#FFFFB2'  :
+    return d >= 4 ? '#BD0026' :
+           d >= 3  ? '#F03B20' :
+           d >= 2   ? '#FD8D3C' :
+           d >= 1   ? '#FECC5C' :
+           d >= 0   ? '#FFFFB2'  :
                       '#808080';
   }
 
   function getColor_rt_seven(d) {
-    return d > 4 ? '#BD0026' :
-           d > 3  ? '#F03B20' :
-           d > 2   ? '#FD8D3C' :
-           d > 1   ? '#FECC5C' :
-           d > 0   ? '#FFFFB2'  :
+    return d >= 4 ? '#BD0026' :
+           d >= 3  ? '#F03B20' :
+           d >= 2   ? '#FD8D3C' :
+           d >= 1   ? '#FECC5C' :
+           d >= 0   ? '#FFFFB2'  :
                       '#808080';
   }
 
@@ -491,13 +491,13 @@ function closeNav() {
   }
 
   function getColor_seven_day_percap(d) {
-    return d > 2000 ? '#800026' :
-           d > 1500  ? '#B10026' :
-           d > 1000  ? '#D41121' :
-           d > 500  ? '#FD5D2D' :
-           d > 250  ? '#FEAB49' :
-           d > 100   ? '#FFE187' :
-           d > 0   ? '#FFFFCC' :
+    return d >= 2000 ? '#800026' :
+           d >= 1500  ? '#B10026' :
+           d >= 1000  ? '#D41121' :
+           d >= 500  ? '#FD5D2D' :
+           d >= 250  ? '#FEAB49' :
+           d >= 100   ? '#FFE187' :
+           d >= 0   ? '#FFFFCC' :
                       '#808080';
   } 
 
@@ -1501,10 +1501,10 @@ function buildRtThreeLayer(my_data_var){
           div.innerHTML +=
             labels.push(
               '<i style="background:' + getColor_cases(cases[i] + 1) + '"></i> ' +
-              '> ' + cases[i]);
+              '>= ' + cases[i]);
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1520,10 +1520,10 @@ function buildRtThreeLayer(my_data_var){
           div.innerHTML +=
             labels.push(
               '<i style="background:' + getColor_rt(rt[i] + 1) + '"></i> ' +
-              '> ' + rt[i]);
+              '>= ' + rt[i]);
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1539,10 +1539,10 @@ legend_rt_three = L.control({position: 'bottomright'});
           div.innerHTML +=
             labels.push(
               '<i style="background:' + getColor_rt_three(rt[i] + 1) + '"></i> ' +
-              '> ' + rt[i]);
+              '>= ' + rt[i]);
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1558,10 +1558,10 @@ legend_rt_three = L.control({position: 'bottomright'});
             div.innerHTML +=
               labels.push(
                 '<i style="background:' + getColor_rt_seven(rt[i] + 1) + '"></i> ' +
-                '> ' + rt[i]);
+                '>= ' + rt[i]);
         }
         div.innerHTML +=
-          labels.push('<i style="background: #808080"></i>' + "0 or NA")
+          labels.push('<i style="background: #808080"></i>' + "NA")
         div.innerHTML = labels.join('<br>');
         return div;
   };
@@ -1578,10 +1578,10 @@ legend_rt_three = L.control({position: 'bottomright'});
           div.innerHTML +=
           labels.push(
               '<i style="background:' + getColor_per_delta(per_delta[i] + 1) + '"></i> ' +
-              '> ' + per_delta[i] + '%');
+              '>= ' + per_delta[i] + '%');
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0% or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1597,10 +1597,10 @@ legend_rt_three = L.control({position: 'bottomright'});
           div.innerHTML +=
           labels.push(
               '<i style="background:' + getColor_death(death[i] + 1) + '"></i> ' +
-              '> ' + death[i]);
+              '>= ' + death[i]);
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
@@ -1663,10 +1663,10 @@ legend_rt_three = L.control({position: 'bottomright'});
           div.innerHTML +=
             labels.push(
               '<i style="background:' + getColor_seven_day_percap(percap[i] + 1) + '"></i> ' +
-              '> ' + percap[i]);
+              '>= ' + percap[i]);
       }
       div.innerHTML +=
-        labels.push('<i style="background: #808080"></i>' + "0 or NA")
+        labels.push('<i style="background: #808080"></i>' + "NA")
       div.innerHTML = labels.join('<br>');
       return div;
   };
