@@ -719,6 +719,8 @@ function closeNav() {
 
 		    	var plot_dat = d.map(a => a.case_count);
 		    	var dates = d.map(a => a.date)
+		    	console.log(dates)
+		    	console.log(plot_dat)
 
 		    	testlayer = L.control.plot({position: 'topleft'}).addTo(mymap)
 
